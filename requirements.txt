@@ -1,7 +1,6 @@
 fastapi
 uvicorn
 google-generativeai
-sentence-transformers
 faiss-cpu
 PyMuPDF
 sqlalchemy

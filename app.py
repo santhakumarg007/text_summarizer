@@ -16,7 +16,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from typing import List, Dict, Any
 
-from sentence_transformers import SentenceTransformer
+
 from sqlalchemy.orm import Session
 from docx import Document as DocxDocument
 from fpdf import FPDF
@@ -56,8 +56,8 @@ DATA_DIR = "data"
 INDEX_DIR = "index"
 EXPORT_DIR = "exports"
 
-EMBED_MODEL = "all-MiniLM-L6-v2"
-EMBED_DIM = 384
+EMBED_MODEL = "models/text-embedding-004"
+EMBED_DIM = 768
 TOP_K = 5
 
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -68,10 +68,8 @@ INDEX_FILE = os.path.join(INDEX_DIR, "faiss.index")
 META_FILE = os.path.join(INDEX_DIR, "metadata.json")
 
 # -----------------------------
-# Load Embedding Model & FAISS
+# FAISS Setup
 # -----------------------------
-
-embedder = SentenceTransformer(EMBED_MODEL)
 
 if os.path.exists(INDEX_FILE):
     index = faiss.read_index(INDEX_FILE)
@@ -121,7 +119,18 @@ def chunk_text(text: str, chunk_size=2000, overlap=300):
     return chunks
 
 def embed_texts(texts: List[str]):
-    return embedder.encode(texts, convert_to_numpy=True)
+    if not GEMINI_API_KEY:
+        return np.zeros((len(texts), EMBED_DIM))
+    try:
+        result = genai.embed_content(
+            model=EMBED_MODEL,
+            content=texts,
+            task_type="retrieval_document"
+        )
+        return np.array(result['embedding'])
+    except Exception as e:
+        print(f"Embedding Error: {e}")
+        return np.zeros((len(texts), EMBED_DIM))
 
 def save_index():
     faiss.write_index(index, INDEX_FILE)
