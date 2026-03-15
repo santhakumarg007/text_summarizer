@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+data/
+index/
+exports/
+database.db
+server_log.txt
+.env
