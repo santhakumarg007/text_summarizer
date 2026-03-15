@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | AI Intelligence{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Most styles exist in base.html, adding dashboard-specific layout */
+    .dashboard-layout {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 25px;
+        width: 100%;
+        max-width: 1200px;
+    }
+
+    .sidebar {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 24px;
+        height: fit-content;
+    }
+
+    .doc-item {
+        padding: 12px;
+        border-bottom: 1px solid var(--glass-border);
+        cursor: pointer;
+        transition: background 0.2s;
+        border-radius: 8px;
+        margin-bottom: 8px;
+    }
+
+    .doc-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .doc-title {
+        font-weight: 600;
+        font-size: 14px;
+        word-break: break-all;
+    }
+
+    .doc-date {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 4px;
+    }
+
+    .export-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .export-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--glass-border);
+        color: rgb(235, 225, 225);
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: all 0.2s;
+    }
+
+    .export-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .main-content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    /* The main styles from file5_FE.html carry over */
+    .section {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 16px;
+        padding: 24px;
+        border: 1px solid var(--glass-border);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .section:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.035);
+        border-color: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    h3 {
+        font-size: 19px;
+        font-weight: 600;
+        margin: 0 0 20px 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #fff;
+    }
+
+    h3::before {
+        content: '';
+        display: inline-block;
+        width: 6px;
+        height: 24px;
+        border-radius: 4px;
+        background: var(--vibrant-gradient);
+    }
+
+    .file-upload-wrapper {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    input[type="file"] {
+        width: 100%;
+        padding: 16px;
+        background: rgba(0, 0, 0, 0.25);
+        border: 2px dashed rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 14px;
+        color: var(--text-main);
+        box-sizing: border-box;
+    }
+
+    input[type="file"]:hover {
+        border-color: var(--accent-2);
+        background: rgba(139, 92, 246, 0.05);
+    }
+
+    input[type="file"]::file-selector-button {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
+        margin-right: 16px;
+        cursor: pointer;
+    }
+
+    button.action-btn {
+        background: var(--vibrant-gradient);
+        color: white;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-width: 160px;
+        box-shadow: 0 4px 15px rgba(9, 252, 49, 0.25);
+    }
+
+    button.action-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(5, 238, 5, 0.89);
+    }
+
+    button.action-btn:disabled {
+        background: #27272a;
+        color: #52525b;
+        cursor: not-allowed;
+        box-shadow: none;
+        border: 1px solid #3f3f46;
+    }
+
+    textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 16px;
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        font-family: inherit;
+        font-size: 15px;
+        color: var(--text-main);
+        resize: vertical;
+        box-sizing: border-box;
+        margin-bottom: 20px;
+    }
+
+    textarea:focus {
+        outline: none;
+        border-color: var(--accent-1);
+    }
+
+    .output-area {
+        margin-top: 20px;
+        padding: 24px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 12px;
+        border-left: 4px solid var(--accent-2);
+        font-size: 15px;
+        line-height: 1.7;
+        white-space: pre-wrap;
+        display: none;
+        color: #e4e4e7;
+    }
+
+    .status-text {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-top: 16px;
+    }
+
+    .spinner {
+        width: 18px;
+        height: 18px;
+        border: 3px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 0.8s linear infinite;
+        display: none;
+    }
+
+    button .spinner.active {
+        display: inline-block;
+    }
+
+    .disabled-section {
+        opacity: 0.5;
+        transition: opacity 0.4s ease;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    .tabs {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid var(--glass-border);
+        padding-bottom: 10px;
+    }
+
+    .tab {
+        padding: 8px 16px;
+        cursor: pointer;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+        color: var(--text-muted);
+    }
+
+    .tab.active {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-1);
+        border: 1px solid var(--accent-1);
+    }
+
+    #rawTextSection {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <h3 style="font-size: 16px; margin-bottom: 15px;">Your Documents</h3>
+        {% if documents %}
+        <div style="max-height: 500px; overflow-y: auto; padding-right: 5px;">
+            {% for doc in documents %}
+            <div class="doc-item"
+                onclick="loadDocument('{{ doc.paper_id }}', `{{ doc.summary_text | escape if doc.summary_text else '' }}`)">
+                <div class="doc-title">{{ doc.filename }}</div>
+                <div class="doc-date">{{ doc.upload_date.strftime('%Y-%m-%d %H:%M') }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="font-size: 13px; color: var(--text-muted);">No documents uploaded yet.</p>
+        {% endif %}
+    </aside>
+
+    <div class="main-content container"
+        style="max-width: 100%; border: none; padding: 0; box-shadow: none; background: transparent; backdrop-filter: none;">
+        <div class="section">
+            <h3>1. Provide Content</h3>
+            <div class="tabs">
+                <div class="tab active" id="pdfTab" onclick="switchTab('pdf')">PDF File</div>
+                <div class="tab" id="textTab" onclick="switchTab('text')">Raw Text</div>
+            </div>
+
+            <div id="pdfUploadSection">
+                <div class="file-upload-wrapper">
+                    <input type="file" id="pdfFile" accept=".pdf">
+                </div>
+                <button class="action-btn" id="uploadBtn" onclick="uploadPDF()">
+                    <span class="spinner" id="uploadSpinner"></span>
+                    <span id="uploadBtnText">Upload PDF</span>
+                </button>
+            </div>
+
+            <div id="rawTextSection">
+                <textarea id="rawTextInput" placeholder="Paste your research notes or text here..."
+                    style="min-height: 200px; margin-bottom: 15px;"></textarea>
+                <div style="margin-bottom: 15px;">
+                    <input type="text" id="rawTextFilename" placeholder="Give this a title (optional)"
+                        style="width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.25); border: 1px solid var(--glass-border); border-radius: 8px; color: white;">
+                </div>
+                <button class="action-btn" id="uploadTextBtn" onclick="uploadText()">
+                    <span class="spinner" id="uploadTextSpinner"></span>
+                    <span id="uploadTextBtnText">Process Text</span>
+                </button>
+            </div>
+
+            <div id="uploadStatus" class="status-text"></div>
+        </div>
+
+        <div class="section disabled-section" id="summarySection">
+            <h3>2. Executive Summary</h3>
+            <button class="action-btn" id="summaryBtn" onclick="summarize()" disabled>
+                <span class="spinner" id="summarySpinner"></span>
+                <span id="summaryBtnText">Generate Summary</span>
+            </button>
+            <div id="summaryOutput" class="output-area"></div>
+
+            <div class="export-buttons" id="exportContainer" style="display: none;">
+                <button class="export-btn" onclick="exportFile('txt')">↓ TXT</button>
+                <button class="export-btn" onclick="exportFile('docx')">↓ Word (DOCX)</button>
+                <button class="export-btn" onclick="exportFile('pdf')">↓ PDF</button>
+            </div>
+        </div>
+
+        <div class="section disabled-section" id="insightsSection">
+            <h3>3. Deep Insights (Q&A)</h3>
+            <p class="status-text" style="margin-top: 0; margin-bottom: 12px; color: var(--text-main);">Ask specific
+                questions (one per line):</p>
+            <textarea id="questions"
+                placeholder="What is the main objective of this study?&#10;What methodology was used?"
+                disabled></textarea>
+            <button class="action-btn" id="insightsBtn" onclick="getInsights()" disabled>
+                <span class="spinner" id="insightsSpinner"></span>
+                <span id="insightsBtnText">Extract Answers</span>
+            </button>
+            <div id="answersOutput" class="output-area"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/script.js"></script>
+{% endblock %}

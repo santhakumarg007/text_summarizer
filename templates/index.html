@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Home | AI Intelligence{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero {
+        text-align: center;
+        padding: 80px 20px;
+        max-width: 800px;
+        margin: auto;
+    }
+    
+    .hero h1 {
+        font-size: 56px;
+        font-weight: 800;
+        margin-bottom: 24px;
+        line-height: 1.1;
+        background: var(--vibrant-gradient);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -1px;
+    }
+    
+    .hero p {
+        font-size: 20px;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin-bottom: 40px;
+        font-weight: 400;
+    }
+    
+    .cta-btn {
+        background: var(--vibrant-gradient);
+        color: white;
+        text-decoration: none;
+        padding: 16px 36px;
+        border-radius: 14px;
+        font-size: 18px;
+        font-weight: 600;
+        display: inline-block;
+        transition: all 0.3s;
+        box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+    }
+    
+    .cta-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(236, 72, 153, 0.5);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Unlock Documents<br>With AI Intelligence</h1>
+    <p>Upload large research papers, books, or dense PDFs. Let our advanced AI instantly extract key contributions, summaries, and answer your exact questions in seconds.</p>
+    
+    {% if user %}
+        <a href="/dashboard" class="cta-btn">Go to Dashboard →</a>
+    {% else %}
+        <a href="/register" class="cta-btn">Start Summarizing Free →</a>
+    {% endif %}
+</div>
+{% endblock %}

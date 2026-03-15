@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+google-generativeai
+sentence-transformers
+faiss-cpu
+PyMuPDF
+sqlalchemy
+python-docx
+fpdf
+pydantic
+jinja2
+python-multipart
+python-jose[cryptography]
+bcrypt
+numpy
